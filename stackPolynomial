@@ -1,0 +1,27 @@
+evaluatePolynomial :: [Double] -> Double -> Double
+evaluatePolynomial coefficients x = evalStack (reverse coefficients) x [] 0 0
+
+evalStack :: [Double] -> Double -> [Double] -> Int -> Int -> Double
+evalStack [] _ stack _ 0= sum stack
+evalStack (c:cs) x stack n 0 = evalStack cs x (push stack c) n 1
+evalStack cs x stack n 1 = evalStack cs x (pushX stack x n) n 2
+evalStack cs x stack n 2 = evalStack cs x (mulX stack n) n 3
+evalStack cs x stack n 3 = evalStack cs x stack (n+1) 0
+
+push :: [Double] -> Double -> [Double]
+push stack value = value : stack
+
+pushX :: [Double] -> Double -> Int -> [Double]
+pushX stack x 0 = stack
+pushX stack x n = pushX (push stack x) x (n-1)
+
+mulX :: [Double] -> Int -> [Double]
+mulX stack 0 = stack 
+mulX (a:b:rest) n = mulX ((a*b):rest) (n-1)
+
+main :: IO ()
+main = do
+    let coefficients = [2, 4, 5] 
+    let x = 3   
+    let result = evaluatePolynomial coefficients x
+    putStrLn $ "The value of the polynomial at x = " ++ show x ++ " is " ++ show result
